@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/xhtml.xhtml to edit this template
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h = "http://java.sun.com/jsf/html"
+      xmlns:f = "http://java.sun.com/jsf/core"
+      xmlns:p = "http://primefaces.org/ui">
+    <h:head>
+        <title>TODO supply a title</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </h:head>
+    <h:body>
+        <div class="card">
+            <p:tabMenu activeIndex="#{param.i}">
+                <p:menuitem value="Home" outcome="/cardealership/homepage.xhtml" icon="pi pi-fw pi-home">
+                    <f:param name="i" value="0"/>
+                </p:menuitem>
+                <p:menuitem value="Dealers" outcome="/cardealership/dealers.xhtml" icon="pi pi-fw pi-calendar">
+                    <f:param name="i" value="1"/>
+                </p:menuitem>
+                <p:menuitem value="Regions" outcome="/cardealership/regions.xhtml" icon="pi pi-fw pi-pencil">
+                    <f:param name="i" value="2"/>
+                </p:menuitem>
+            </p:tabMenu>
+        </div>
+
+        <p:growl id="msgs" showDetail="true">
+            <p:autoUpdate />
+        </p:growl>
+
+        <h:form>
+            <p:commandButton id="signOut"
+                             rendered="#{sessionScope.isAdmin}" 
+                             value="Sign out"
+                             action = "#{login.signOut}"
+                             ajax = "false"/>
+        </h:form>
+        <h:form>
+            <p:dataTable value="#{manages.roles}" var="role">
+                <p:column headerText="Name">
+                    <p:outputLabel value="#{role.roleName}"/>  
+                </p:column>
+                <p:column headerText="Regions">
+                    <p:selectManyCheckbox value="#{role.regions}"
+                                          converter="#{selectRegionEntityConverter}"
+                                          >
+                        <p:ajax listener="#{manages.selectedOptionsChanged}" />
+                        <f:selectItems value="#{manages.availableRegions}"
+                                       var="region"
+                                       itemLabel="#{region.regionName}"
+                                       itemValue="#{region}"/>
+                    </p:selectManyCheckbox>
+                </p:column>
+            </p:dataTable>
+            <p:commandButton action="#{manages.submitting}" />
+        </h:form>
+    </h:body>
+</html>
