@@ -10,6 +10,7 @@ import com.makosdanii.cardealership.business.services.UserService;
 import com.makosdanii.cardealership.data.entities.Brand;
 import com.makosdanii.cardealership.data.entities.Store;
 import com.makosdanii.cardealership.data.entities.StoreKeys;
+import com.makosdanii.cardealership.data.entities.Users;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -55,9 +56,9 @@ public class Stores {
             return;
         }
 
-        Object id = ((HttpSession) session).getAttribute("userid");
+        Object id = ((HttpSession) session).getAttribute("user");
         if (id != null) {
-            sessionUserId = (int) id;
+            sessionUserId = ((Users) id).getId();
 
             store = new HashSet<Store>();
             syncStore();

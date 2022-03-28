@@ -83,4 +83,15 @@ public class Region implements Serializable {
 
     public Region() {
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        }
+        return ((Region) obj).id == this.id;
+    }
 }

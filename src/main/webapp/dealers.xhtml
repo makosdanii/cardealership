@@ -10,7 +10,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/xhtml.xhtml to edit this te
       xmlns:p = "http://primefaces.org/ui"
       xmlns:c="http://java.sun.com/jsp/jstl/core">
     <h:head>
-        <title>TODO supply a title</title>
+        <title>Dealers</title>
+        <link rel="stylesheet" href="primeflex/mycss.css"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     </h:head>
     <h:body>
@@ -19,114 +20,157 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/xhtml.xhtml to edit this te
                 <p:menuitem value="Home" outcome="/cardealership/homepage.xhtml" icon="pi pi-fw pi-home">
                     <f:param name="i" value="0"/>
                 </p:menuitem>
-                <p:menuitem value="Dealers" outcome="/cardealership/dealers.xhtml" icon="pi pi-fw pi-calendar">
+                <p:menuitem value="Dealers" 
+                            rendered="#{sessionScope.user.role.roleName eq 'global'}"
+                            outcome="/cardealership/dealers.xhtml" icon="pi pi-fw pi-calendar">
                     <f:param name="i" value="1"/>
                 </p:menuitem>
-                <p:menuitem value="Regions" outcome="/cardealership/regions.xhtml" icon="pi pi-fw pi-pencil">
+                <p:menuitem value="Regions"                            
+                            rendered="#{sessionScope.user.role.roleName eq 'global'}"
+                            outcome="/cardealership/regions.xhtml" icon="pi pi-fw pi-pencil">
                     <f:param name="i" value="2"/>
                 </p:menuitem>
             </p:tabMenu>
         </div>
 
-        <p:dataTable id="dataTable" value="#{data.users}" var="user">
-            <p:column headerText="Email">
-                <h:outputText value="#{user.email}" />
-            </p:column>
-            <p:column headerText="Name">
-                <h:outputText value="#{user.name}" />
-            </p:column>
-            <p:column headerText="Password">
-                <h:outputText value="#{user.password}" />
-            </p:column>
-            <p:column headerText="">
-                <f:param name="id" value="#{user.email}" />
-                <a href="/delete?id=#{user.email}">delete</a>
-                <!--                    <p:commandButton value="delete" action="" 
-                                                     update="dataTable">
-                                        <f:param name="id" value="#{user.email}" />
-                                    </p:commandButton>-->
-            </p:column>
-        </p:dataTable><br/>
-
         <h:form>
-            <f:param name="query" value="#{param.query}"/>
-            <input name="query" value="#{param.query}"/>
-            <p:commandButton value="Search" action="#{data.fullTextSearch}"
-                             update="dataTable"/>
-        </h:form><br/>
+            <c:choose>    
+                <c:when test="#{sessionScope.user != null}">
+                    <p:commandButton class="authbtn"
+                                     value="Log out"
+                                     action = "#{login.signOut}"
+                                     ajax = "false"/>
 
-        <h:form>
+                </c:when>
+                <c:otherwise>
+                    <p:commandButton class="authbtn"
+                                     value="Log In"
+                                     action = "/cardealership/login.xhtml"
+                                     ajax = "false"/>
+                    <p:outputLabel class="warning"
+                                   value="No access granted, 
+                                   please view as authorized!"/>
+                </c:otherwise>
+            </c:choose>
+        </h:form>
+
+        <p:outputLabel class="warning"
+                       value="No access granted, please view as authorized!"
+                       rendered="#{sessionScope.user.role.roleName != 'global'}"
+                       />
+
+        <p:growl id="msgs" showDetail="true"/>
+
+        <h:form rendered="#{sessionScope.user.role.roleName eq 'global'}">
+            <p:dataTable id="dataTable" value="#{data.users}" var="user">
+                <p:column headerText="Email">
+                    <p:outputLabel value="#{user.email}" />
+                </p:column>
+                <p:column headerText="Name">
+                    <p:outputLabel value="#{user.name}" />
+                </p:column>
+                <p:column headerText="Password">
+                    <p:outputLabel value="#{user.password}" />
+                </p:column>
+                <p:column headerText="Role">
+                    <p:outputLabel value="#{user.role.roleName}" />
+                </p:column>
+                <p:column headerText="">
+                    <f:param name="id" value="#{user.email}" />
+                    <!--<a href="/delete?id=#{user.email}">delete</a>-->
+                    <p:commandButton value="delete" 
+                                     onclick="confirm('User will get deleted');"
+                                     action="#{data.deleteUser}" 
+                                     update="dataTable">
+                        <f:param name="id" value="#{user.id}" />
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable><br/>
+
+            <span class="ui-input-icon-left">    
+                <i class="pi pi-search" />
+                <p:inputText id="search" placeholder="Search">
+                    <p:ajax update="dataTable" event="input"
+                            listener="#{data.onSearchInputChanged}"/>
+                </p:inputText>
+            </span><br/>
+
             <p:commandButton value="Add" 
-                             onclick ="toggle('#{requestScope.register.clientId}');  return false;"
+                             onclick ="toggle();
+                                     return false;"
                              />
-        </h:form>
-        <noscript>
-            <style type="text/css">
-                form {
-                    display:block;
+
+            <noscript>
+                <style type="text/css">
+                    div {
+                        display:block;
+                    }
+                </style>
+            </noscript>
+            <script type="text/javascript">
+                function toggle() {
+                    const element = document.querySelector('#register')
+                    if (element.style.display === 'block') {
+                        element.style.display = 'none';
+                    } else {
+                        element.style.display = 'block';
+                    }
                 }
-            </style>
-        </noscript>
-        <script type="text/javascript">
-            function toggle(id) {
-                var element = document.getElementById(id);
-                if (element.style.display === 'block') {
-                    element.style.display = 'none';
-                } else {
-                    element.style.display = 'block';
-                }
-            }
-        </script>
+            </script>
 
-        <h:form binding='#{requestScope.register}' style="display: none">
-            <p:panelGrid columns="2">
-                <label for="email2">Email</label><br/>
-                <h:inputText id="email2" value="#{data.email}"
-                             validatorMessage="Email format required"
-                             required="true" 
-                             requiredMessage="Email left empty">
-                    <f:validateRegex pattern="^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$"
-                                     for="email2"/>
-                </h:inputText><br/>
+            <div id="register" style="display: none">
+                <p:panelGrid columns="2">
+                    <label for="email2">Email</label>
+                    <label for="email2" style="color:red;">*</label><br/>
+                    <p:inputText id="email2" value="#{data.email}"
+                                 validatorMessage="Email format required"
+                                 required="true" 
+                                 requiredMessage="Email left empty">
+                        <f:validateRegex pattern="^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$"
+                                         for="email2"/>
+                    </p:inputText><br/>
 
-                <label for="name">Name</label><br/>
-                <h:inputText id="name" value="#{data.name}"
-                             required="true" 
-                             requiredMessage="Name left empty">
-                </h:inputText><br/>
+                    <label for="name">Name</label>
+                    <label for="name" style="color:red;">*</label><br/>
+                    <p:inputText id="name" value="#{data.name}"
+                                 required="true" 
+                                 requiredMessage="Name left empty">
+                    </p:inputText><br/>
 
-                <label for="driversl">Drivers license</label><br/>
-                <h:selectBooleanCheckbox id="driversl" 
-                                         value="#{data.driverslicense}"/><br/>
+                    <label for="driversl">Drivers license</label><br/>
+                    <p:selectBooleanCheckbox id="driversl" 
+                                             value="#{data.driverslicense}"/><br/>
 
-                <label for="password">Password</label><br/>
-                <h:inputSecret id="password2" value="#{data.password}"
-                               validatorMessage="Password be 8 character with digit(s) and capital letter(s)"
-                               required="true" 
-                               requiredMessage="Password left empty">
-                    <f:validateRegex pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$"
-                                     for="password2"/>
-                </h:inputSecret><br/>
+                    <label for="password">Password</label>
+                    <label for="password" style="color:red;">*</label><br/>
+                    <p:password id="password2" value="#{data.password}"
+                                validatorMessage="Password be 8 character with digit(s) and capital letter(s)"
+                                required="true" 
+                                requiredMessage="Password left empty">
+                        <f:validateRegex pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$"
+                                         for="password2"/>
+                    </p:password><br/>
 
-                <label for="isAdminCheck">Assign role: </label>
-                <h:selectOneListbox id="role" required="true"
-                                    requiredMessage="Role must be assigned"
-                                    value="#{data.role}">
-                    <f:selectItems value="#{data.roles}" var="role" 
-                                   itemLabel="#{role.roleName}" 
-                                   itemValue="#{role.id}"/>
-                </h:selectOneListbox>
-            </p:panelGrid><br/>
+                    <label for="role">Assign role: </label>
+                    <label for="role" style="color:red;">*</label><br/>
+                    <p:selectOneListbox id="role" required="true"
+                                        requiredMessage="Role must be assigned"
+                                        value="#{data.role}">
+                        <f:selectItems value="#{data.roles}" var="role" 
+                                       itemLabel="#{role.roleName}" 
+                                       itemValue="#{role.id}"/>
+                    </p:selectOneListbox>
+                </p:panelGrid><br/>
 
-            <p:commandButton value="Register" action="#{data.addUser}"
-                             process="@form" 
-                             update="@(.ui-message) dataTable"/>
-            <p:message for='email2'/>
-            <p:message for='name'/>
-            <p:message for="password2"/>
-            <p:message for="role"/>
+                <p:commandButton value="Register" action="#{data.addUser}"
+                                 process="@form" 
+                                 update="@(.ui-message) dataTable"/>
+                <p:message for='email2'/>
+                <p:message for='name'/>
+                <p:message for="password2"/>
+                <p:message for="role"/>
+            </div>
         </h:form>
-        <!--</c:if>-->
     </h:body>
 </html>
 

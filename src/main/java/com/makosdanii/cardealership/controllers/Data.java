@@ -12,13 +12,16 @@ import com.makosdanii.cardealership.data.entities.Region;
 import com.makosdanii.cardealership.data.entities.Roles;
 import com.makosdanii.cardealership.data.entities.Store;
 import com.makosdanii.cardealership.data.entities.Users;
+import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import org.primefaces.component.inputtext.InputText;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpRequest;
@@ -145,11 +148,26 @@ public class Data {
 
     }
 
-    public void fullTextSearch() {
+    public void deleteUser() {
         HttpServletRequest query = (HttpServletRequest) FacesContext.getCurrentInstance()
                 .getExternalContext()
                 .getRequest();
-        users = us.searchUser(query.getParameter("query"));
+
+        FacesMessage msg;
+        if (us.deleteUser(Integer.valueOf(query.getParameter("id")))) {
+            msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Deleted", null);
+        } else {
+            msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Cannot be deleted", null);
+        }
+
+        FacesContext.getCurrentInstance().addMessage("msgs", msg);
+    }
+
+    public void onSearchInputChanged(AjaxBehaviorEvent event) {
+        InputText query = (InputText) event.getSource();
+        String text = (String) query.getValue();
+        users = new ArrayList<Users>(us.searchUser((String) query.getValue()));
+        return;
     }
 
 }

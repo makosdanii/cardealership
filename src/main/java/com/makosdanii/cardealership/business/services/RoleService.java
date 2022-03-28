@@ -12,7 +12,6 @@ import com.makosdanii.cardealership.data.repositories.RegionRepo;
 import com.makosdanii.cardealership.data.repositories.RoleRepo;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +37,7 @@ public class RoleService {
                 .collect(Collectors.toList());
     }
 
-    public Set<Roles> findRoles(String role_name) {
+    public List<Roles> findRoles(String role_name) {
         return ror.findByRoleName(role_name);
     }
 
@@ -46,14 +45,14 @@ public class RoleService {
         return ror.findById(id).orElse(new Roles());
     }
 
-    public Set<Users> findUsersOfRole(String role_name) {
-        Set<Roles> roles = ror.findByRoleName(role_name);
-        return roles.isEmpty() ? null : roles.iterator().next().getUsers();
+    public List<Users> findUsersOfRole(String role_name) {
+        List<Roles> roles = ror.findByRoleName(role_name);
+        return roles.isEmpty() ? null : roles.get(0).getUsers();
     }
 
     public List<Region> findRegionsofRole(String role_name) {
-        Set<Roles> roles = ror.findByRoleName(role_name);
-        return roles.isEmpty() ? null : roles.iterator().next().getRegions();
+        List<Roles> roles = ror.findByRoleName(role_name);
+        return roles.isEmpty() ? null : roles.get(0).getRegions();
     }
 
     public List<Brand> findBrandsofRole(String role_name) {
@@ -64,4 +63,7 @@ public class RoleService {
         return result;
     }
 
+    public void save(Roles role) {
+        ror.save(role);
+    }
 }

@@ -5,7 +5,9 @@
 package com.makosdanii.cardealership.data.repositories;
 
 import com.makosdanii.cardealership.data.entities.Roles;
+import java.util.List;
 import java.util.Set;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,5 +18,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RoleRepo extends CrudRepository<Roles, Integer> {
 
-    Set<Roles> findByRoleName(String role_name);
+    List<Roles> findByRoleName(String role_name);
+
+    @Query("SELECT DISTINCT r FROM Roles r LEFT JOIN FETCH r.users")
+    Set<Roles> findByRoleNameContaining(String role_name);
 }

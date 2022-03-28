@@ -16,6 +16,9 @@ import org.springframework.stereotype.Repository;
  * @author user
  */
 @Repository
-public interface RegionRepo extends CrudRepository<Region, Integer>{
+public interface RegionRepo extends CrudRepository<Region, Integer> {
+
     List<Region> findByRegionName(String region_name);
+
+    public void save(Roles role);
 }

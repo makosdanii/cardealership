@@ -6,6 +6,7 @@ package com.makosdanii.cardealership.business.services;
 
 import com.makosdanii.cardealership.data.entities.Brand;
 import com.makosdanii.cardealership.data.entities.Region;
+import com.makosdanii.cardealership.data.entities.Roles;
 import com.makosdanii.cardealership.data.repositories.RegionRepo;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;

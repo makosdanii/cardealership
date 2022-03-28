@@ -73,7 +73,7 @@ public class Login {
         }
         HttpSession session = (HttpSession) FacesContext.getCurrentInstance()
                 .getExternalContext().getSession(true);
-        session.setAttribute("userid", u.getId());
+        session.setAttribute("user", u);
 
         return "/cardealership/homepage.xhtml";
     }

@@ -126,4 +126,20 @@ public class Users implements Serializable {
 
     public Users() {
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        return ((Users) obj).getId() == this.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return Integer.valueOf(this.getId()).hashCode();
+    }
 }

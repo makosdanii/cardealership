@@ -8,12 +8,20 @@ import com.makosdanii.cardealership.business.services.RegionService;
 import com.makosdanii.cardealership.business.services.RoleService;
 import com.makosdanii.cardealership.data.entities.Region;
 import com.makosdanii.cardealership.data.entities.Roles;
+import com.makosdanii.cardealership.data.entities.Store;
 import com.makosdanii.cardealership.data.entities.Users;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
+import org.primefaces.event.RowEditEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.context.annotation.SessionScope;
@@ -31,6 +39,9 @@ public class Manages {
 
     private List<Roles> roles;
     private List<Region> availableRegions;
+
+    private boolean newRowOpened = false;
+    private String UNDEFINED = "Undefined";
 
     @Autowired
     public Manages(RegionService res, RoleService ros) {
@@ -54,13 +65,23 @@ public class Manages {
         this.availableRegions = availableRegions;
     }
 
-    public void selectedOptionsChanged() {
-        FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "Changed", null));
+    public boolean isNewRowOpened() {
+        return newRowOpened;
     }
 
-    public void submitting() {
+    public void setNewRowOpened(boolean newRowOpened) {
+        this.newRowOpened = newRowOpened;
+    }
+
+    public void selectedOptionsChanged() {
+        List<Roles> validRoles = roles.stream()
+                .filter(role -> !role.getRoleName()
+                .equals(UNDEFINED)).collect(Collectors.toList());
+        if (validRoles.size() > roles.size()) {
+            newRowOpened = false;
+        }
+
+        validRoles.forEach(ros::save);
         FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                         "Changed", null));
@@ -68,12 +89,45 @@ public class Manages {
 
     @PostConstruct
     public void init() {
-        availableRegions = res.listRegions();
-        roles = ros.listRoles();
-        return;
-//        roles.add(new Roles("Undefined",
-//                new ArrayList<Users>(),
-//                new ArrayList<Region>()));
+        String PU_NAME = "com.makosdanii_cardealership_jar_0.0.1-SNAPSHOTPU";
+        EntityManagerFactory emf = Persistence
+                .createEntityManagerFactory(PU_NAME);
+        EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+
+        TypedQuery<Region> q = em
+                .createQuery("SELECT DISTINCT r FROM Region r LEFT JOIN FETCH r.roles",
+                        Region.class);
+        availableRegions = q.getResultList();
+
+        TypedQuery<Roles> qq = em
+                .createQuery("SELECT DISTINCT r FROM Roles r LEFT JOIN FETCH r.regions",
+                        Roles.class);
+        roles = qq.getResultList();
+
+        em.getTransaction().commit();
+        em.close();
     }
 
+    public void add() {
+        if (newRowOpened) {
+            return;
+        }
+        roles.add(new Roles(UNDEFINED,
+                new ArrayList<Users>(),
+                new ArrayList<Region>()));
+        newRowOpened = true;
+    }
+
+//    public void save(AjaxBehaviorEvent event) {
+//        FacesMessage msg;
+//        if (!((Roles) event.getSource()).getRoleName().equals(UNDEFINED)) {
+//            ros.save(((Roles) event.getSource()));
+//            newRowOpened = false;
+//            msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Changed", null);
+//        } else {
+//            msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Set role name", null);
+//        }
+//        FacesContext.getCurrentInstance().addMessage(null, msg);
+//    }
 }

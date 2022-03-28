@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
-  <persistence-unit name="com.makosdanii_cardealership_jar_0.0.1-SNAPSHOTPU" transaction-type="RESOURCE_LOCAL">
-    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-    <properties>
-      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/dealership?zeroDateTimeBehavior=CONVERT_TO_NULL"/>
-      <property name="javax.persistence.jdbc.user" value="root"/>
-      <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
-      <property name="javax.persistence.jdbc.password" value="mydb140222!"/>
-    </properties>
-  </persistence-unit>
+    <persistence-unit name="com.makosdanii_cardealership_jar_0.0.1-SNAPSHOTPU" transaction-type="RESOURCE_LOCAL">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <class>com.makosdanii.cardealership.data.entities.Brand</class>
+        <class>com.makosdanii.cardealership.data.entities.Region</class>
+        <class>com.makosdanii.cardealership.data.entities.Roles</class>
+        <class>com.makosdanii.cardealership.data.entities.Store</class>
+        <class>com.makosdanii.cardealership.data.entities.Users</class>
+        <properties>
+            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/dealership?zeroDateTimeBehavior=CONVERT_TO_NULL"/>
+            <property name="javax.persistence.jdbc.user" value="root"/>
+            <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
+            <property name="javax.persistence.jdbc.password" value="mydb140222!"/>
+        </properties>
+    </persistence-unit>
 </persistence>

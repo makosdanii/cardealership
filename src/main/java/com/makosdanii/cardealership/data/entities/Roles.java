@@ -6,7 +6,6 @@ package com.makosdanii.cardealership.data.entities;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -37,8 +36,8 @@ public class Roles implements Serializable {
     @Column(name = "role_name", nullable = false, unique = true)
     private String roleName;
 
-    @OneToMany(mappedBy = "role", fetch = FetchType.EAGER)
-    private Set<Users> users;
+    @OneToMany(mappedBy = "role")
+    private List<Users> users;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -63,11 +62,11 @@ public class Roles implements Serializable {
         this.roleName = roleName;
     }
 
-    public Set<Users> getUsers() {
+    public List<Users> getUsers() {
         return users;
     }
 
-    public void setUsers(Set<Users> users) {
+    public void setUsers(List<Users> users) {
         this.users = users;
     }
 
@@ -79,7 +78,7 @@ public class Roles implements Serializable {
         this.regions = regions;
     }
 
-    public Roles(String role_name, Set<Users> users,
+    public Roles(String role_name, List<Users> users,
             List<Region> regions) {
         this.roleName = role_name;
         this.users = users;
