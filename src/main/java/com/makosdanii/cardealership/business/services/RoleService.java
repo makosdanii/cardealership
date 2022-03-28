@@ -12,6 +12,7 @@ import com.makosdanii.cardealership.data.repositories.RegionRepo;
 import com.makosdanii.cardealership.data.repositories.RoleRepo;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,14 +26,22 @@ import org.springframework.stereotype.Service;
 public class RoleService {
 
     private final RoleRepo ror;
+    private final RegionService rs;
 
     @Autowired
-    public RoleService(RoleRepo rr) {
+    public RoleService(RoleRepo rr, RegionService rs) {
         this.ror = rr;
+        this.rs = rs;
     }
 
     public List<Roles> listRoles() {
         return ((List<Roles>) ror.findAll()).stream()
+                .filter(u -> !u.getRoleName().equals("admin"))
+                .collect(Collectors.toList());
+    }
+
+    public List<Roles> listRolesFetchRegions() {
+        return ((List<Roles>) ror.findAllFetchRegions()).stream()
                 .filter(u -> !u.getRoleName().equals("admin"))
                 .collect(Collectors.toList());
     }
@@ -46,19 +55,26 @@ public class RoleService {
     }
 
     public List<Users> findUsersOfRole(String role_name) {
-        List<Roles> roles = ror.findByRoleName(role_name);
-        return roles.isEmpty() ? null : roles.get(0).getUsers();
+        Optional<Roles> roles = ror.findAllFetchUsers()
+                .stream()
+                .filter(role -> role.getRoleName().equals(role_name))
+                .findFirst();
+        return roles.isPresent() ? roles.get().getUsers() : null;
     }
 
     public List<Region> findRegionsofRole(String role_name) {
-        List<Roles> roles = ror.findByRoleName(role_name);
-        return roles.isEmpty() ? null : roles.get(0).getRegions();
+        Optional<Roles> roles = ror.findAllFetchRegions()
+                .stream()
+                .filter(role -> role.getRoleName().equals(role_name))
+                .findFirst();
+        return roles.isPresent() ? roles.get().getRegions() : null;
     }
 
     public List<Brand> findBrandsofRole(String role_name) {
         List<Region> regions = findRegionsofRole(role_name);
         List<Brand> result = new ArrayList<Brand>();
-        regions.forEach(reg -> result.addAll(reg.getBrands()));
+        regions.forEach(region -> result
+                .addAll(rs.findBrandsofRegion(region.getRegionName())));
 
         return result;
     }

@@ -39,7 +39,7 @@ public class Roles implements Serializable {
     @OneToMany(mappedBy = "role")
     private List<Users> users;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(
             name = "manages",
             joinColumns = @JoinColumn(name = "role_id"),

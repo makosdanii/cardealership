@@ -56,7 +56,7 @@ public class Users implements Serializable {
     @ManyToOne
     private Roles role;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user")
     private Set<Store> store;
 
     public int getId() {

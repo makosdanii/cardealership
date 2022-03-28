@@ -6,6 +6,7 @@ package com.makosdanii.cardealership.data.repositories;
 
 import com.makosdanii.cardealership.data.entities.Store;
 import com.makosdanii.cardealership.data.entities.StoreKeys;
+import java.util.Set;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,8 +14,9 @@ import org.springframework.stereotype.Repository;
  *
  * @author user
  */
-
 @Repository
-public interface StoreRepo extends CrudRepository<Store, StoreKeys>{
-    
+public interface StoreRepo extends CrudRepository<Store, Integer> {
+
+    public Set<Store> findAll();
+
 }

@@ -38,7 +38,7 @@ public class Stores {
     private Set<Store> store;
     private List<Brand> availableBrands;
 
-    private int sessionUserId;
+    private Users sessionUser;
     private boolean newRowOpened = false;
 
     @Autowired
@@ -58,28 +58,26 @@ public class Stores {
 
         Object id = ((HttpSession) session).getAttribute("user");
         if (id != null) {
-            sessionUserId = ((Users) id).getId();
+            sessionUser = ((Users) id);
 
             store = new HashSet<Store>();
             syncStore();
 
-            String role = ros.findbyId(
-                    us.findbyId(sessionUserId)
-                            .getId())
-                    .getRoleName();
-            availableBrands = ros.findBrandsofRole(role);
+            availableBrands = ros.findBrandsofRole(((Users) id).getRole().getRoleName());
         }
 
     }
 
     private void syncStore() {
-        store.forEach(ss::addToStore);
+        store.stream()
+                .filter(store -> !store.getModel().equals("Unspecified"))
+                .forEach(ss::addToStore);
 
-        if (ros.findbyId(us.findbyId(sessionUserId)
-                .getId()).getRoleName().equals("worldwide")) {
+        if (sessionUser.getRole()
+                .getRoleName().equals("global")) {
             store = ss.listStores();
         } else {
-            store = us.getUserStore(sessionUserId);
+            store = sessionUser.getStore();
         }
     }
 
@@ -102,8 +100,8 @@ public class Stores {
     public void addItem() {
         if (!newRowOpened) {
             store.add(new Store(
-                    new StoreKeys(sessionUserId, availableBrands.get(0).getId(), "Unspecified"),
-                    us.findbyId(sessionUserId),
+                    "Unspecified",
+                    sessionUser,
                     availableBrands.get(0), 0));
             newRowOpened = true;
         }
@@ -111,7 +109,7 @@ public class Stores {
 
     public void onRowEdit(RowEditEvent<Store> event) {
         FacesMessage msg;
-        if (event.getObject().getId().getModel().equals("Unspecified")) {
+        if (event.getObject().getModel().equals("Unspecified")) {
             msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Cell couldn't be saved",
                     "Brand or model not specified");
         } else {
@@ -124,7 +122,7 @@ public class Stores {
     }
 
     public void onRowCancel(RowEditEvent<Store> event) {
-        if (event.getObject().getId().getModel().equals("Unspecified")) {
+        if (event.getObject().getModel().equals("Unspecified")) {
             store.remove(event.getObject());
             newRowOpened = false;
         }

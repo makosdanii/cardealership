@@ -45,14 +45,11 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/xhtml.xhtml to edit this te
                                      value="Log In"
                                      action = "/cardealership/login.xhtml"
                                      ajax = "false"/>
-                    <p:outputLabel class="warning"
-                                   value="No access granted, 
-                                   please view as authorized!"/>
                 </c:otherwise>
             </c:choose>
         </h:form>
 
-        <h:form id="store">
+        <h:form id="store" rendered="#{sessionScope.user != null}">
             <p:growl id="msgs" showDetail="true"/>
 
             <p:dataTable id="products1" var="product" 
@@ -63,7 +60,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/xhtml.xhtml to edit this te
                 <p:ajax event="rowEditCancel" listener="#{stores.onRowCancel}" update=":store:msgs"/>
 
 
-                <p:column headerText="Storemanager's ID" rendered="#{sessionScope.userid == 1}">
+                <p:column headerText="Storemanager's ID" 
+                          rendered="#{sessionScope.user.role.roleName eq 'global'}">
                     <h:outputText value ="#{product.user.id}"/>
                 </p:column>
 
@@ -88,10 +86,10 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/xhtml.xhtml to edit this te
                 <p:column headerText="Model">
                     <p:cellEditor>
                         <f:facet name="output">
-                            <h:outputText value="#{product.id.model}"/>
+                            <h:outputText value="#{product.model}"/>
                         </f:facet>
                         <f:facet name="input">
-                            <p:inputText value="#{product.id.model}"/>
+                            <p:inputText value="#{product.model}"/>
                         </f:facet>
                     </p:cellEditor>
                 </p:column>

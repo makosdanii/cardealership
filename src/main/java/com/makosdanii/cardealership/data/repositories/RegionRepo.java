@@ -8,6 +8,7 @@ import com.makosdanii.cardealership.data.entities.Roles;
 import com.makosdanii.cardealership.data.entities.Users;
 import com.makosdanii.cardealership.data.entities.Region;
 import java.util.List;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -19,6 +20,13 @@ import org.springframework.stereotype.Repository;
 public interface RegionRepo extends CrudRepository<Region, Integer> {
 
     List<Region> findByRegionName(String region_name);
+
+    @Query("SELECT DISTINCT r FROM Region r LEFT JOIN FETCH r.brands")
+    List<Region> findAllFetchBrands();
+
+    @Query("SELECT DISTINCT r FROM Region r LEFT JOIN FETCH r.brands "
+            + "LEFT JOIN FETCH r.roles")
+    List<Region> findAllFetchAll();
 
     public void save(Roles role);
 }

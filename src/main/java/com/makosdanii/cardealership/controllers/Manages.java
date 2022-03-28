@@ -89,6 +89,8 @@ public class Manages {
 
     @PostConstruct
     public void init() {
+        availableRegions = res.listRegionsFetchAll();
+        roles = ros.listRolesFetchRegions();
         String PU_NAME = "com.makosdanii_cardealership_jar_0.0.1-SNAPSHOTPU";
         EntityManagerFactory emf = Persistence
                 .createEntityManagerFactory(PU_NAME);

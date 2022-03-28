@@ -47,9 +47,6 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/xhtml.xhtml to edit this te
                                      value="Log In"
                                      action = "/cardealership/login.xhtml"
                                      ajax = "false"/>
-                    <p:outputLabel class="warning"
-                                   value="No access granted, 
-                                   please view as authorized!"/>
                 </c:otherwise>
             </c:choose>
         </h:form>
@@ -96,6 +93,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/xhtml.xhtml to edit this te
             </span><br/>
 
             <p:commandButton value="Add" 
+                             style="margin-top: 10px;"
                              onclick ="toggle();
                                      return false;"
                              />

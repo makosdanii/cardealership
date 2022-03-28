@@ -9,6 +9,7 @@ import com.makosdanii.cardealership.data.entities.Region;
 import com.makosdanii.cardealership.data.entities.Roles;
 import com.makosdanii.cardealership.data.repositories.RegionRepo;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,12 @@ public class RegionService {
 
     public List<Region> listRegions() {
         return (List<Region>) rr.findAll();
+
+    }
+
+    public List<Region> listRegionsFetchAll() {
+        return (List<Region>) rr.findAllFetchAll();
+
     }
 
     public List<Region> findRegions(String region_name) {
@@ -38,8 +45,11 @@ public class RegionService {
         return rr.findById(id).orElse(new Region());
     }
 
-    public List<Brand> findBrandsofRegion(String brand_name) {
-        List<Region> regions = rr.findByRegionName(brand_name);
-        return regions.isEmpty() ? null : regions.get(0).getBrands();
+    public List<Brand> findBrandsofRegion(String region_name) {
+        Optional<Region> regions = rr.findAllFetchBrands()
+                .stream()
+                .filter(region -> region.getRegionName().equals(region_name))
+                .findFirst();
+        return regions.isPresent() ? regions.get().getBrands() : null;
     }
 }

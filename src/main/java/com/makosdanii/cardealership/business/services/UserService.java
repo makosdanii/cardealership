@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -41,6 +42,14 @@ public class UserService {
         return u.isEmpty() ? new Users() : u.get(0);
     }
 
+    public Users findUserFetchStores(String email) {
+        Optional<Users> u = ur.findAllFetchStore()
+                .stream()
+                .filter(user -> user.getEmail().equals(email))
+                .findFirst();
+        return u.isPresent() ? u.get() : new Users();
+    }
+
     public List<Users> listUsers() {
         return ((List<Users>) ur.findAll()).stream()
                 .filter(u -> !u.getRole().getRoleName().equals("admin"))
@@ -63,21 +72,12 @@ public class UserService {
         Collection<? extends Users> var2 = ur.findByNameContaining(infix);
         result.addAll(var2);
 
-        Collection<? extends Roles> var3 = rr.findByRoleNameContaining(infix);
+        Collection<? extends Roles> var3 = rr.findAllFetchUsers();
         var3.stream()
                 .filter(role -> role.getRoleName().contains(infix))
                 .forEach(role -> result.addAll(role.getUsers()));
 
         return result;
-    }
-
-    @Transactional
-    public Set<Store> getUserStore(int id) {
-        Users u = ur.findById(id).get();
-        if (u == null) {
-            return new HashSet<>();
-        }
-        return u.getStore();
     }
 
     public Users findbyId(int id) {

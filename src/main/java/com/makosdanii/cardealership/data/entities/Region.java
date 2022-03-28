@@ -35,10 +35,10 @@ public class Region implements Serializable {
     @Column(name = "region_name", nullable = false, unique = true)
     private String regionName;
 
-    @OneToMany(mappedBy = "region", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "region")
     private List<Brand> brands;
 
-    @ManyToMany(mappedBy = "regions", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "regions")
     private Set<Roles> roles;
 
     public int getId() {

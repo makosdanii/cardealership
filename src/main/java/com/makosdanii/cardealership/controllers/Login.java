@@ -20,45 +20,45 @@ import org.springframework.web.context.annotation.SessionScope;
 @Controller("login")
 @SessionScope
 public class Login {
-
+    
     private String email;
     private String password;
     private boolean rememberme;
-
+    
     private final UserService us;
-
+    
     @Autowired
     public Login(UserService us) {
         this.us = us;
     }
-
+    
     public boolean isRememberme() {
         return rememberme;
     }
-
+    
     public void setRememberme(boolean rememberme) {
         this.rememberme = rememberme;
     }
-
+    
     public String getEmail() {
         return email;
     }
-
+    
     public void setEmail(String email) {
         this.email = email;
     }
-
+    
     public String getPassword() {
         return password;
     }
-
+    
     public void setPassword(String password) {
         this.password = password;
     }
-
+    
     public String signIn() {
-        Users u = this.us.findUser(this.email);
-
+        Users u = this.us.findUserFetchStores(email);
+        
         if (u.getRole() == null) {
             FacesContext.getCurrentInstance().addMessage("authform:email",
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -74,18 +74,18 @@ public class Login {
         HttpSession session = (HttpSession) FacesContext.getCurrentInstance()
                 .getExternalContext().getSession(true);
         session.setAttribute("user", u);
-
+        
         return "/cardealership/homepage.xhtml";
     }
-
+    
     public String signOut() {
         HttpSession session = (HttpSession) FacesContext.getCurrentInstance()
                 .getExternalContext().getSession(false);
         if (session != null) {
             session.invalidate();
         }
-
+        
         return "/cardealership/login.xhtml";
-
+        
     }
 }

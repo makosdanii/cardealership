@@ -20,6 +20,9 @@ public interface RoleRepo extends CrudRepository<Roles, Integer> {
 
     List<Roles> findByRoleName(String role_name);
 
+    @Query("SELECT DISTINCT r FROM Roles r LEFT JOIN FETCH r.regions")
+    List<Roles> findAllFetchRegions();
+
     @Query("SELECT DISTINCT r FROM Roles r LEFT JOIN FETCH r.users")
-    Set<Roles> findByRoleNameContaining(String role_name);
+    Set<Roles> findAllFetchUsers();
 }

@@ -21,8 +21,6 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/xhtml.xhtml to edit this te
                     <!--                    <p:graphicImage name="images/blocks/logos/hyper.svg" library="primeblocks-app" alt="Image"
                                                         height="50" styleClass="mb-3"/>-->
                     <div class="text-900 text-3xl font-medium mb-3">Welcome Back</div>
-                    <span class="text-600 font-medium line-height-3">Don't have an account?</span>
-                    <a class="font-medium no-underline ml-2 text-blue-500 cursor-pointer" href="registrationpage.xhtml">Create today!</a>
                 </div>
 
                 <h:form id="authform">
@@ -32,19 +30,18 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/xhtml.xhtml to edit this te
                     <label for="password1" class="block text-900 font-medium mb-2">Password</label>
                     <p:inputText id="password1" value="#{login.password}" type="password" styleClass="w-full mb-3"/>
 
-                    <div class="flex align-items-center justify-content-between mb-6">
-                        <div class="flex align-items-center">
-                            <p:selectBooleanCheckbox id="rememberme" value="#{login.rememberme}" styleClass="mr-2"/>
-                            <label for="rememberme">Remember me</label>
-                        </div>
-                        <a class="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">Forgot your password?</a>
-                    </div>
+                    <!--                    <div class="flex align-items-center justify-content-between mb-6">
+                                            <div class="flex align-items-center">
+                                                <p:selectBooleanCheckbox id="rememberme" value="#{login.rememberme}" styleClass="mr-2"/>
+                                                <label for="rememberme">Remember me</label>
+                                            </div>
+                                            <a class="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">Forgot your password?</a>
+                                        </div>-->
 
                     <p:commandButton value="Login" action="#{login.signIn}" 
                                      icon="pi pi-user" styleClass="w-full"
                                      update="@(.ui-message)">
-                        <!--<f:setPropertyActionListener value="true" target="" />-->
-                    </p:commandButton><br/>
+                    </p:commandButton><br/><br/>
                     <p:message for="email" />
                     <p:message for="password1" />
                 </h:form>

@@ -7,6 +7,7 @@ package com.makosdanii.cardealership.data.repositories;
 import com.makosdanii.cardealership.data.entities.Users;
 import java.util.List;
 import java.util.Set;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -24,5 +25,8 @@ public interface UserRepo extends CrudRepository<Users, Integer> {
     public Set<Users> findByEmailContaining(String infix);
 
     public Set<Users> findByNameContaining(String infix);
+
+    @Query("Select Distinct u from Users u LEFT JOIN FETCH u.store")
+    public List<Users> findAllFetchStore();
 
 }

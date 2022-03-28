@@ -30,7 +30,7 @@ public class StoreService {
         this.rs = rs;
     }
 
-    public Store findById(StoreKeys id) {
+    public Store findById(Integer id) {
         return sr.findById(id).orElse(new Store());
     }
 
@@ -39,7 +39,7 @@ public class StoreService {
     }
 
     public boolean addToStore(Store store) {
-        String roleid = us.findbyId(store.getId().getUserId())
+        String roleid = us.findbyId(store.getUser().getId())
                 .getRole()
                 .getRoleName();
 
@@ -47,7 +47,7 @@ public class StoreService {
         //is in the list of the regions managed by the dealer
         if (rs.findBrandsofRole(roleid)
                 .stream()
-                .filter(r -> r.getId() == store.getId().getBrandId())
+                .filter(r -> r.getId() == store.getBrand().getId())
                 .collect(Collectors.toList())
                 .isEmpty()) {
             return false;

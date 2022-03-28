@@ -9,38 +9,46 @@ import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
+import javax.persistence.Table;
 
 /**
  *
  * @author user
  */
 @Entity
+@Table(name = "store")
 public class Store implements Serializable {
 
-    @EmbeddedId
-    private StoreKeys id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private int id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @MapsId("userId")
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private Users user;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @MapsId("brandId")
-    @JoinColumn(name = "brand_id", updatable = true)
+    @ManyToOne
+    @JoinColumn(name = "brand_id")
     private Brand brand;
+
+    @Column(name = "model")
+    private String model;
 
     @Column(name = "quantity")
     private int quantity;
 
-    public StoreKeys getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(StoreKeys id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -60,6 +68,14 @@ public class Store implements Serializable {
         this.brand = brand;
     }
 
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
     public int getQuantity() {
         return quantity;
     }
@@ -68,8 +84,8 @@ public class Store implements Serializable {
         this.quantity = quantity;
     }
 
-    public Store(StoreKeys id, Users user, Brand brand, int quantity) {
-        this.id = id;
+    public Store(String model, Users user, Brand brand, int quantity) {
+        this.model = model;
         this.quantity = quantity;
         this.user = user;
         this.brand = brand;
