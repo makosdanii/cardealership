@@ -58,35 +58,56 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/xhtml.xhtml to edit this te
 
         <p:growl id="msgs" showDetail="true"/>
 
-        <h:form rendered="#{sessionScope.user.role.roleName eq 'global'}">
-            <p:dataTable id="dataTable" value="#{data.users}" var="user">
-                <p:column headerText="Email">
-                    <p:outputLabel value="#{user.email}" />
-                </p:column>
-                <p:column headerText="Name">
-                    <p:outputLabel value="#{user.name}" />
-                </p:column>
-                <p:column headerText="Password">
-                    <p:outputLabel value="#{user.password}" />
-                </p:column>
-                <p:column headerText="Role">
-                    <p:outputLabel value="#{user.role.roleName}" />
-                </p:column>
-                <p:column headerText="">
-                    <f:param name="id" value="#{user.email}" />
-                    <!--<a href="/delete?id=#{user.email}">delete</a>-->
-                    <p:commandButton value="delete" 
-                                     onclick="confirm('User will get deleted');"
+        <p:dataTable binding="#{requestScope.dealers}"
+                     id="dataTable" value="#{data.users}" var="user"
+                     rendered="#{sessionScope.user.role.roleName eq 'global'}"
+                     >
+            <p:column headerText="Email">
+                <p:outputLabel value="#{user.email}" />
+            </p:column>
+            <p:column headerText="Name">
+                <p:outputLabel value="#{user.name}" />
+            </p:column>
+            <p:column headerText="Password">
+                <p:outputLabel value="#{user.password}" />
+            </p:column>
+            <p:column headerText="Role">
+                <p:outputLabel value="#{user.role.roleName}" />
+            </p:column>
+            <p:column headerText="">
+                <h:form id="delete">
+                    <p:commandButton value="Delete" 
+                                     onclick="confirm('User will be deleted');"
                                      action="#{data.deleteUser}" 
-                                     update="dataTable">
+                                     update="@this msgs dataTable"
+
+                                     disabled = "#{user.role.roleName eq 'global'}">
                         <f:param name="id" value="#{user.id}" />
                     </p:commandButton>
-                </p:column>
-            </p:dataTable><br/>
+                </h:form>
+            </p:column>
+        </p:dataTable><br/>
 
+        <h:form id="form" rendered="#{sessionScope.user.role.roleName eq 'global'}">
             <span class="ui-input-icon-left">    
                 <i class="pi pi-search" />
-                <p:inputText id="search" placeholder="Search">
+                <p:inputText id="search" 
+                             placeholder="Search"
+                             oninput="highlight(event, '#{requestScope.dealers.clientId}');"
+                             >
+                    <script>
+                        function highlight(event, id) {
+                            const query = event.target.value
+                            const cells = document.getElementById(id)
+                                    .querySelectorAll('td')
+                            cells.forEach(cell => {
+                                if (cell.innerText.includes(query)) {
+                                    cell.style.border = '10px solid coral';
+                                    cell.style.borderRadius = '10px';
+                                }
+                            })
+                        }
+                    </script>
                     <p:ajax update="dataTable" event="input"
                             listener="#{data.onSearchInputChanged}"/>
                 </p:inputText>
@@ -156,7 +177,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/xhtml.xhtml to edit this te
                                         value="#{data.role}">
                         <f:selectItems value="#{data.roles}" var="role" 
                                        itemLabel="#{role.roleName}" 
-                                       itemValue="#{role.id}"/>
+                                       itemValue="#{role.id}"
+                                       itemDisabled="#{role.roleName eq 'global'}"/>
                     </p:selectOneListbox>
                 </p:panelGrid><br/>
 

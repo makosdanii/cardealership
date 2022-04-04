@@ -4,6 +4,7 @@
  */
 package com.makosdanii.cardealership.data.repositories;
 
+import com.makosdanii.cardealership.data.entities.Roles;
 import com.makosdanii.cardealership.data.entities.Users;
 import java.util.List;
 import java.util.Set;
@@ -28,5 +29,7 @@ public interface UserRepo extends CrudRepository<Users, Integer> {
 
     @Query("Select Distinct u from Users u LEFT JOIN FETCH u.store")
     public List<Users> findAllFetchStore();
+
+    public List<Users> findByRole(Roles role);
 
 }

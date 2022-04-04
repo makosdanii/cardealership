@@ -30,11 +30,17 @@ public class UserService {
 
     private final UserRepo ur;
     private final RoleRepo rr;
+    private final RoleService rs;
+    private final StoreService ss;
 
     @Autowired
-    public UserService(UserRepo ur, RoleRepo rr) {
+    public UserService(UserRepo ur, RoleRepo rr,
+            RoleService rs, StoreService ss) {
         this.ur = ur;
         this.rr = rr;
+        this.rs = rs;
+        this.ss = ss;
+
     }
 
     public Users findUser(String email) {
@@ -88,9 +94,16 @@ public class UserService {
         if (!ur.existsById(id)) {
             return false;
         }
+
+        Users u = ur.findById(id).get();
+        ss.returnStore(u, managerInstance());
         ur.deleteById(id);
         return true;
+    }
 
+    public Users managerInstance() {
+        return ur.findByRole(rs.findRoles("global").get(0))
+                .get(0);
     }
 
 }

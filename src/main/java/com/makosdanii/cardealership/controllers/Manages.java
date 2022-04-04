@@ -11,6 +11,7 @@ import com.makosdanii.cardealership.data.entities.Roles;
 import com.makosdanii.cardealership.data.entities.Store;
 import com.makosdanii.cardealership.data.entities.Users;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
@@ -21,6 +22,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
+import org.primefaces.component.inputtext.InputText;
 import org.primefaces.event.RowEditEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -36,6 +38,7 @@ public class Manages {
 
     private final RegionService res;
     private final RoleService ros;
+    private final Stores stores;
 
     private List<Roles> roles;
     private List<Region> availableRegions;
@@ -44,9 +47,10 @@ public class Manages {
     private String UNDEFINED = "Undefined";
 
     @Autowired
-    public Manages(RegionService res, RoleService ros) {
+    public Manages(RegionService res, RoleService ros, Stores stores) {
         this.res = res;
         this.ros = ros;
+        this.stores = stores;
     }
 
     public List<Roles> getRoles() {
@@ -74,17 +78,22 @@ public class Manages {
     }
 
     public void selectedOptionsChanged() {
-        List<Roles> validRoles = roles.stream()
-                .filter(role -> !role.getRoleName()
-                .equals(UNDEFINED)).collect(Collectors.toList());
-        if (validRoles.size() > roles.size()) {
-            newRowOpened = false;
-        }
+        newRowOpened = !roles.stream().allMatch(role -> !role.getRoleName().equals(UNDEFINED));
+        HashSet<Roles> unique = new HashSet(roles);
 
-        validRoles.forEach(ros::save);
+        unique.stream()
+                .filter(role -> !role.getRoleName()
+                .equals(UNDEFINED)).forEach(ros::save);
         FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                         "Changed", null));
+        stores.init();
+        if (unique.size() != roles.size()) {
+            newRowOpened = true;
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Some duplicates cannot be saved", null));
+        }
     }
 
     @PostConstruct
@@ -115,21 +124,18 @@ public class Manages {
         if (newRowOpened) {
             return;
         }
-        roles.add(new Roles(UNDEFINED,
-                new ArrayList<Users>(),
-                new ArrayList<Region>()));
+        roles.add(new Roles(UNDEFINED));
         newRowOpened = true;
     }
 
-//    public void save(AjaxBehaviorEvent event) {
-//        FacesMessage msg;
-//        if (!((Roles) event.getSource()).getRoleName().equals(UNDEFINED)) {
-//            ros.save(((Roles) event.getSource()));
-//            newRowOpened = false;
-//            msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Changed", null);
-//        } else {
-//            msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Set role name", null);
-//        }
-//        FacesContext.getCurrentInstance().addMessage(null, msg);
-//    }
+    public void save(AjaxBehaviorEvent event) {
+        FacesMessage msg;
+        InputText query = (InputText) event.getSource();
+        String text = (String) query.getValue();
+        if (!text.equals(UNDEFINED)) {
+            msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Changed", null);
+        } else {
+            msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Set role name", null);
+        }
+    }
 }

@@ -84,4 +84,3 @@ INSERT INTO MANAGES(role_id, region_id) VALUES (1,2);
 
 -- select * from users;
 -- select * from brand;
-

@@ -40,6 +40,7 @@ public class Data {
     private final RoleService ros;
     private final RegionService res;
     private final StoreService ss;
+    private final Stores stores;
 
     private List<Users> users;
     private List<Roles> roles;
@@ -116,11 +117,13 @@ public class Data {
     }
 
     @Autowired
-    public Data(UserService us, RoleService ros, RegionService res, StoreService ss) {
+    public Data(UserService us, RoleService ros, RegionService res,
+            StoreService ss, Stores stores) {
         this.us = us;
         this.ros = ros;
         this.res = res;
         this.ss = ss;
+        this.stores = stores;
     }
 
     @PostConstruct
@@ -156,6 +159,8 @@ public class Data {
         FacesMessage msg;
         if (us.deleteUser(Integer.valueOf(query.getParameter("id")))) {
             msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Deleted", null);
+            stores.init();
+            init();
         } else {
             msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Cannot be deleted", null);
         }
@@ -165,9 +170,7 @@ public class Data {
 
     public void onSearchInputChanged(AjaxBehaviorEvent event) {
         InputText query = (InputText) event.getSource();
-        String text = (String) query.getValue();
         users = new ArrayList<Users>(us.searchUser((String) query.getValue()));
-        return;
     }
 
 }

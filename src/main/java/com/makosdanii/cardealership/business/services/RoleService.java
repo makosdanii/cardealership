@@ -82,4 +82,8 @@ public class RoleService {
     public void save(Roles role) {
         ror.save(role);
     }
+
+    public boolean notExists(String roleName) {
+        return ror.findByRoleName(roleName).isEmpty();
+    }
 }

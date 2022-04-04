@@ -85,15 +85,17 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/xhtml.xhtml to edit this te
                         <p:inputText id="roleName" value="#{role.roleName}"
                                      rendered="#{role.roleName == 'Undefined'}"
                                      style="width:100%">
-                            <!--<p:ajax event="valueChange" listener="#" update="msgs" />-->
+                            <p:ajax event='change' listener="#{manages.save}" update="selectmany"/>
                         </p:inputText>
                     </p:column>
                     <p:column headerText="Regions">
-                        <p:selectManyCheckbox value="#{role.regions}"
+                        <p:selectManyCheckbox id="selectmany"
+                                              value="#{role.regions}"
                                               converter="#{selectRegionEntityConverter}"
                                               >
+                            <f:attribute name="collectionType" value="java.util.ArrayList" />
                             <p:ajax listener="#{manages.selectedOptionsChanged}"
-                                    update="msgs"/>
+                                    update="msgs :form:add"/>
                             <f:selectItems value="#{manages.availableRegions}"
                                            var="region"
                                            itemLabel="#{region.regionName}"
@@ -107,6 +109,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/xhtml.xhtml to edit this te
             <p:commandButton value="Add"
                              id="add"
                              action="#{manages.add}"
+                             disabled="#{manages.newRowOpened}"
                              update="rolesTable @this"/>
 
             <p:contextMenu for="rolesTable" widgetVar="cMenu">

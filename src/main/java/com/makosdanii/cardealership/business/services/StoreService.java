@@ -4,8 +4,10 @@
  */
 package com.makosdanii.cardealership.business.services;
 
+import com.makosdanii.cardealership.controllers.Stores;
 import com.makosdanii.cardealership.data.entities.Store;
 import com.makosdanii.cardealership.data.entities.StoreKeys;
+import com.makosdanii.cardealership.data.entities.Users;
 import com.makosdanii.cardealership.data.repositories.StoreRepo;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,13 +22,11 @@ import org.springframework.stereotype.Service;
 public class StoreService {
 
     private final StoreRepo sr;
-    private final UserService us;
     private final RoleService rs;
 
     @Autowired
-    public StoreService(StoreRepo sr, UserService us, RoleService rs) {
+    public StoreService(StoreRepo sr, RoleService rs) {
         this.sr = sr;
-        this.us = us;
         this.rs = rs;
     }
 
@@ -39,9 +39,7 @@ public class StoreService {
     }
 
     public boolean addToStore(Store store) {
-        String roleid = us.findbyId(store.getUser().getId())
-                .getRole()
-                .getRoleName();
+        String roleid = store.getUser().getRole().getRoleName();
 
         //check whether the region of the brand which is to be added to store 
         //is in the list of the regions managed by the dealer
@@ -56,4 +54,13 @@ public class StoreService {
         sr.save(store);
         return true;
     }
+
+    public void returnStore(Users from, Users to) {
+        Set<Store> stores = sr.findByUser(from);
+        stores.forEach(store -> {
+            store.setUser(to);
+            sr.save(store);
+        });
+    }
+
 }

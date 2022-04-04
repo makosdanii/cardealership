@@ -56,8 +56,10 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/xhtml.xhtml to edit this te
                          value="#{stores.store}" editable="true"
                          style="margin-bottom:20px" 
                          widgetVar="cellProducts">
-                <p:ajax event="rowEdit" listener="#{stores.onRowEdit}" update=":store:msgs"/>
-                <p:ajax event="rowEditCancel" listener="#{stores.onRowCancel}" update=":store:msgs"/>
+                <p:ajax event="rowEdit" listener="#{stores.onRowEdit}" 
+                        update=":store:add :store:msgs"/>
+                <p:ajax event="rowEditCancel" listener="#{stores.onRowCancel}" 
+                        update=":store:add :store:msgs"/>
 
 
                 <p:column headerText="Storemanager's ID" 
@@ -111,8 +113,11 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/xhtml.xhtml to edit this te
                 </p:column>
             </p:dataTable><br/>
 
-            <p:commandButton value="Add" action="#{stores.addItem}"
-                             update=":store:products1"/>
+            <p:commandButton value="Add" 
+                             id="add"
+                             action="#{stores.addItem}"
+                             update=":store:products1 @this"
+                             disabled="#{stores.newRowOpened}"/>
 
             <p:contextMenu for="products1" widgetVar="cMenu">
                 <p:menuitem value="Edit Cell" icon="pi pi-search"

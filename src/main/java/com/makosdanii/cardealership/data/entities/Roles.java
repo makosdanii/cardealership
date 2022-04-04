@@ -5,6 +5,7 @@
 package com.makosdanii.cardealership.data.entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -78,13 +79,28 @@ public class Roles implements Serializable {
         this.regions = regions;
     }
 
-    public Roles(String role_name, List<Users> users,
-            List<Region> regions) {
-        this.roleName = role_name;
-        this.users = users;
-        this.regions = regions;
+    public Roles() {
     }
 
-    public Roles() {
+    public Roles(String role_name) {
+        this.roleName = role_name;
+        regions = new ArrayList();
+        users = new ArrayList();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        return ((Roles) obj).getRoleName().equals(this.getRoleName());
+    }
+
+    @Override
+    public int hashCode() {
+        return this.getRoleName().hashCode();
     }
 }

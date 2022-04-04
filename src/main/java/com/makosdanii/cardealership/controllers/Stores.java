@@ -39,7 +39,7 @@ public class Stores {
     private List<Brand> availableBrands;
 
     private Users sessionUser;
-    private boolean newRowOpened = false;
+    private boolean newRowOpened;
 
     @Autowired
     public Stores(RoleService ros, UserService us, StoreService ss) {
@@ -64,6 +64,7 @@ public class Stores {
             syncStore();
 
             availableBrands = ros.findBrandsofRole(((Users) id).getRole().getRoleName());
+            newRowOpened = availableBrands.isEmpty();
         }
 
     }
@@ -95,6 +96,14 @@ public class Stores {
 
     public void setStore(Set<Store> store) {
         this.store = store;
+    }
+
+    public boolean isNewRowOpened() {
+        return newRowOpened;
+    }
+
+    public void setNewRowOpened(boolean newRowOpened) {
+        this.newRowOpened = newRowOpened;
     }
 
     public void addItem() {
