@@ -22,12 +22,12 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/xhtml.xhtml to edit this te
                 </p:menuitem>
                 <p:menuitem value="Dealers"
                             rendered="#{sessionScope.user.role.roleName eq 'global'}"
-                            outcome="/cardealership/dealers.xhtml" icon="pi pi-fw pi-calendar">
+                            outcome="/cardealership/dealers.xhtml" icon="pi pi-fw pi-briefcase">
                     <f:param name="i" value="1"/>
                 </p:menuitem>
                 <p:menuitem value="Regions" 
                             rendered="#{sessionScope.user.role.roleName eq 'global'}"
-                            outcome="/cardealership/regions.xhtml" icon="pi pi-fw pi-pencil">
+                            outcome="/cardealership/regions.xhtml" icon="pi pi-fw pi-globe">
                     <f:param name="i" value="2"/>
                 </p:menuitem>
             </p:tabMenu>
@@ -36,14 +36,14 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/xhtml.xhtml to edit this te
         <h:form>
             <c:choose>    
                 <c:when test="#{sessionScope.user != null}">
-                    <p:commandButton class="authbtn"
+                    <p:commandButton class="authbtn" icon="pi pi-users"
                                      value="Log out"
                                      action = "#{login.signOut}"
                                      ajax = "false"/>
 
                 </c:when>
                 <c:otherwise>
-                    <p:commandButton class="authbtn"
+                    <p:commandButton class="authbtn" icon="pi pi-users"
                                      value="Log In"
                                      action = "/cardealership/login.xhtml"
                                      ajax = "false"/>
