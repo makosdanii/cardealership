@@ -74,12 +74,8 @@ public class Stores {
                 .filter(store -> !store.getModel().equals("Unspecified"))
                 .forEach(ss::addToStore);
 
-        if (sessionUser.getRole()
-                .getRoleName().equals("global")) {
-            store = ss.listStores();
-        } else {
-            store = sessionUser.getStore();
-        }
+        store = sessionUser.getStore();
+
     }
 
     public List<Brand> getAvailableBrands() {

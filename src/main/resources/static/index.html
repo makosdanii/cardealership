@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+
+
+        <script type="module" src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.21.1/babel.min.js"></script>
+        <script type="text/babel">
+            import { createApp, ref } from 'vue.js'
+            import PlayerCard from './PlayerCard.js'
+                    createApp({
+                        components: {
+                            PlayerCard
+                        },
+                        setup() {
+                            const text = ref('Hello')
+
+                            return{
+                                data: {
+                                    players: [
+                                        {id: "1", name: "Lionel Messi", description: "Argentina's superstar"},
+                                        {id: "2", name: "Christiano Ronaldo", description: "Portugal top-ranked player"}
+                                    ]
+                                },
+                                text
+                            }
+                        }
+                    }).mount('#contents')
+        </script>
+        <div id="contents-main">
+            <div id="contents">
+                <p>{{text}}</p>
+                <ul>
+                    <li v-for="player in players">
+                    <player-card :player="player" :key="player.id">
+                    </player-card>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </body>
+</html>

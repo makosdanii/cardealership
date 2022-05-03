@@ -4,6 +4,7 @@
  */
 package com.makosdanii.cardealership.data.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
@@ -54,9 +55,11 @@ public class Users implements Serializable {
     @NotNull
     @JoinColumn(name = "role_id")
     @ManyToOne
+    @JsonManagedReference
     private Roles role;
 
     @OneToMany(mappedBy = "user")
+    @JsonManagedReference
     private Set<Store> store;
 
     public int getId() {

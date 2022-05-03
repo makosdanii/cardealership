@@ -4,6 +4,8 @@
  */
 package com.makosdanii.cardealership.data.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -36,8 +38,9 @@ public class Brand implements Serializable {
 
     @JoinColumn(name = "region_id")
     @ManyToOne
+    @JsonBackReference
     private Region region;
-
+    @JsonBackReference
     @OneToMany(mappedBy = "brand")
     private List<Store> store;
 

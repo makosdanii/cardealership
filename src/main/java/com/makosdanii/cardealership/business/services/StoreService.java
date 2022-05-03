@@ -5,10 +5,13 @@
 package com.makosdanii.cardealership.business.services;
 
 import com.makosdanii.cardealership.controllers.Stores;
+import com.makosdanii.cardealership.data.entities.Region;
 import com.makosdanii.cardealership.data.entities.Store;
 import com.makosdanii.cardealership.data.entities.StoreKeys;
+import com.makosdanii.cardealership.data.entities.Roles;
 import com.makosdanii.cardealership.data.entities.Users;
 import com.makosdanii.cardealership.data.repositories.StoreRepo;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +39,19 @@ public class StoreService {
 
     public Set<Store> listStores() {
         return (Set<Store>) sr.findAll();
+    }
+
+    public List<Store> listStoresOfRole(Integer roleId) {
+        List<Region> regions = rs.listRolesFetchRegions()
+                .stream()
+                .filter(role -> role.getId() == roleId)
+                .collect(Collectors.toList())
+                .get(0).getRegions();
+        return listStores()
+                .stream()
+                .filter(store -> regions
+                .contains(store.getBrand().getRegion()))
+                .collect(Collectors.toList());
     }
 
     public boolean addToStore(Store store) {

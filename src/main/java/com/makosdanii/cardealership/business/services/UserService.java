@@ -57,9 +57,7 @@ public class UserService {
     }
 
     public List<Users> listUsers() {
-        return ((List<Users>) ur.findAll()).stream()
-                .filter(u -> !u.getRole().getRoleName().equals("admin"))
-                .collect(Collectors.toList());
+        return (List<Users>) ur.findAll();
     }
 
     public boolean addUser(Users user) {

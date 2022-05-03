@@ -4,6 +4,8 @@
  */
 package com.makosdanii.cardealership.data.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
@@ -32,6 +34,7 @@ public class Store implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private Users user;
 
     @ManyToOne
@@ -89,6 +92,14 @@ public class Store implements Serializable {
         this.quantity = quantity;
         this.user = user;
         this.brand = brand;
+    }
+
+    public Store(int id, Users user, Brand brand, String model, int quantity) {
+        this.id = id;
+        this.user = user;
+        this.brand = brand;
+        this.model = model;
+        this.quantity = quantity;
     }
 
     public Store() {

@@ -5,6 +5,7 @@
 package com.makosdanii.cardealership.data.repositories;
 
 import com.makosdanii.cardealership.data.entities.Brand;
+import java.util.List;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,4 +16,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BrandRepo extends CrudRepository<Brand, Integer> {
 
+    List<Brand> findByBrandName(String brandName);
 }

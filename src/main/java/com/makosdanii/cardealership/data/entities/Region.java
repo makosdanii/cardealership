@@ -4,6 +4,7 @@
  */
 package com.makosdanii.cardealership.data.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
@@ -35,6 +36,7 @@ public class Region implements Serializable {
     @Column(name = "region_name", nullable = false, unique = true)
     private String regionName;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "region")
     private List<Brand> brands;
 

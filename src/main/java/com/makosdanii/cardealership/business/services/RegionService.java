@@ -32,8 +32,8 @@ public class RegionService {
 
     }
 
-    public List<Region> listRegionsFetchAll() {
-        return (List<Region>) rr.findAllFetchAll();
+    public List<Region> listRegionsFetchRoles() {
+        return (List<Region>) rr.findAllFetchRoles();
 
     }
 

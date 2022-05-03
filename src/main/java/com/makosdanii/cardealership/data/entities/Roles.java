@@ -4,6 +4,8 @@
  */
 package com.makosdanii.cardealership.data.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +40,7 @@ public class Roles implements Serializable {
     private String roleName;
 
     @OneToMany(mappedBy = "role")
+    @JsonBackReference
     private List<Users> users;
 
     @ManyToMany
@@ -45,6 +48,7 @@ public class Roles implements Serializable {
             name = "manages",
             joinColumns = @JoinColumn(name = "role_id"),
             inverseJoinColumns = @JoinColumn(name = "region_id"))
+    @JsonBackReference("users")
     private List<Region> regions;
 
     public int getId() {

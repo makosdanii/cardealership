@@ -24,9 +24,8 @@ public interface RegionRepo extends CrudRepository<Region, Integer> {
     @Query("SELECT DISTINCT r FROM Region r LEFT JOIN FETCH r.brands")
     List<Region> findAllFetchBrands();
 
-    @Query("SELECT DISTINCT r FROM Region r LEFT JOIN FETCH r.brands "
-            + "LEFT JOIN FETCH r.roles")
-    List<Region> findAllFetchAll();
+    @Query("SELECT DISTINCT r FROM Region r LEFT JOIN FETCH r.roles")
+    List<Region> findAllFetchRoles();
 
     public void save(Roles role);
 }

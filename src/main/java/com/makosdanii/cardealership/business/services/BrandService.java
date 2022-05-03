@@ -6,6 +6,8 @@ package com.makosdanii.cardealership.business.services;
 
 import com.makosdanii.cardealership.data.entities.Brand;
 import com.makosdanii.cardealership.data.repositories.BrandRepo;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +28,11 @@ public class BrandService {
     public Brand findById(int id) {
         return rr.findById(id).orElse(new Brand());
 
+    }
+
+    public Brand findbyBrandName(String brandName) {
+        List<Brand> list = rr.findByBrandName(brandName);
+        return list.isEmpty() ? new Brand() : list.get(0);
     }
 
 }

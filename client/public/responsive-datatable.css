@@ -1,0 +1,33 @@
+/* html { overflow-y: auto !important } */
+.v-application--wrap {   min-height: 100% !important; }
+
+.scrolled {
+  position: fixed !important;
+  top: 20px;
+  right: 20px;
+}
+
+.topped {
+  position: relative;
+  top: 55px;;
+  z-index: 1;
+}
+
+.scrolled button {
+  width: 5px;
+}
+
+.scrolled #add, .scrolled #search {
+  display: none;
+}
+
+.grow-table{
+  flex-grow: 5;
+}
+.scrollable-table {
+  display: flex;
+  justify-content: flex-end;
+  flex-flow: row wrap;
+  align-items: stretch;
+  margin-top: -50px;
+}

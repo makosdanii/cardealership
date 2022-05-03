@@ -80,7 +80,9 @@ INSERT INTO MANAGES(role_id, region_id) VALUES (1,2);
 -- select roles.role_name, region.region_name
 -- from manages
 -- inner join roles on roles.id = role_id
--- inner join region on region.id = region_id
+-- inner join region on region.id = region_id;
 
--- select * from users;
--- select * from brand;
+-- select * from users; 
+-- select * from brand; 
+-- select * from roles;
+-- select * from store;
