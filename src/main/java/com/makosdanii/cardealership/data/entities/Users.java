@@ -4,7 +4,10 @@
  */
 package com.makosdanii.cardealership.data.entities;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +33,7 @@ import javax.validation.constraints.NotNull;
  */
 @Entity
 @Table(name = "users")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Users implements Serializable {
 
     @Id
@@ -59,7 +63,6 @@ public class Users implements Serializable {
     private Roles role;
 
     @OneToMany(mappedBy = "user")
-    @JsonManagedReference
     private Set<Store> store;
 
     public int getId() {
@@ -124,6 +127,22 @@ public class Users implements Serializable {
         this.name = name;
         this.driversLicense = drivers_license;
         this.password = password;
+        this.role = role;
+    }
+
+//for updating existing one
+    public Users(Integer id, String email, String name, Boolean drivers_license,
+            String password, Roles role) {
+        this.id = id;
+        this.email = email;
+        this.name = name;
+        this.driversLicense = drivers_license;
+        this.password = password;
+        this.role = role;
+    }
+
+//selecting for creation with role defined/undefined
+    public Users(Roles role) {
         this.role = role;
     }
 

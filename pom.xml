@@ -148,6 +148,14 @@
             <version>3.0.9</version>
             <type>pom</type>
         </dependency>
+        
+        <!-- https://mvnrepository.com/artifact/org.json/json -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20210307</version>
+        </dependency>
+
 
     </dependencies>
 

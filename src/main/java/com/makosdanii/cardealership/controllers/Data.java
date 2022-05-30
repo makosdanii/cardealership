@@ -141,7 +141,7 @@ public class Data {
             return;
         }
 
-        if (us.addUser(new Users(email, name, driverslicense, password, role))) {
+        if (us.addUser(new Users(email, name, driverslicense, password, role)) != -1) {
             message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Successful", null);
             users = us.listUsers();
         } else {

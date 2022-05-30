@@ -21,13 +21,15 @@
   display: none;
 }
 
-.grow-table{
-  flex-grow: 5;
+.scrollable-table > div{
+  flex-grow: 100%;
+  width: 100%
 }
 .scrollable-table {
   display: flex;
-  justify-content: flex-end;
-  flex-flow: row wrap;
-  align-items: stretch;
+  /* justify-content: flex-end; */
+  flex-flow: column wrap;
+  align-items: flex-end;
+  width: 100%;
   margin-top: -50px;
 }

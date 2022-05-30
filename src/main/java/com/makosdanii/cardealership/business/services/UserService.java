@@ -29,16 +29,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepo ur;
-    private final RoleRepo rr;
-    private final RoleService rs;
     private final StoreService ss;
 
     @Autowired
-    public UserService(UserRepo ur, RoleRepo rr,
-            RoleService rs, StoreService ss) {
+    public UserService(UserRepo ur, StoreService ss) {
         this.ur = ur;
-        this.rr = rr;
-        this.rs = rs;
         this.ss = ss;
 
     }
@@ -60,12 +55,12 @@ public class UserService {
         return (List<Users>) ur.findAll();
     }
 
-    public boolean addUser(Users user) {
-        if (!ur.existsByEmail(user.getEmail())) {
+    public int addUser(Users user) {
+        if (!ur.existsByEmail(user.getEmail()) || user.getId() != 0) {
             ur.save(user);
-            return true;
+            return this.findUser(user.getEmail()).getId();
         }
-        return false;
+        return -1;
     }
 
     public Set<Users> searchUser(String infix) {
@@ -76,11 +71,10 @@ public class UserService {
         Collection<? extends Users> var2 = ur.findByNameContaining(infix);
         result.addAll(var2);
 
-        Collection<? extends Roles> var3 = rr.findAllFetchUsers();
-        var3.stream()
-                .filter(role -> role.getRoleName().contains(infix))
-                .forEach(role -> result.addAll(role.getUsers()));
-
+//        Collection<? extends Roles> var3 = rr.findAllFetchUsers();
+//        var3.stream()
+//                .filter(role -> role.getRoleName().contains(infix))
+//                .forEach(role -> result.addAll(role.getUsers()));
         return result;
     }
 
@@ -99,9 +93,16 @@ public class UserService {
         return true;
     }
 
+    public String deleteItsStore(Users u, int id) {
+        if (ss.deleteStore(id)) {
+            u = this.findUserFetchStores(u.getEmail());
+            return "Item deleted";
+        }
+        return "Invalid ID provided";
+    }
+
     public Users managerInstance() {
-        return ur.findByRole(rs.findRoles("global").get(0))
-                .get(0);
+        return (Users) ur.findByNameContaining("Global").toArray()[0];
     }
 
 }

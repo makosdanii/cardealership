@@ -25,33 +25,22 @@ import org.springframework.stereotype.Service;
 public class StoreService {
 
     private final StoreRepo sr;
-    private final RoleService rs;
 
     @Autowired
-    public StoreService(StoreRepo sr, RoleService rs) {
+    public StoreService(StoreRepo sr) {
         this.sr = sr;
-        this.rs = rs;
     }
 
     public Store findById(Integer id) {
         return sr.findById(id).orElse(new Store());
     }
 
-    public Set<Store> listStores() {
-        return (Set<Store>) sr.findAll();
+    public Set<Store> findByUser(Users u) {
+        return sr.findByUser(u);
     }
 
-    public List<Store> listStoresOfRole(Integer roleId) {
-        List<Region> regions = rs.listRolesFetchRegions()
-                .stream()
-                .filter(role -> role.getId() == roleId)
-                .collect(Collectors.toList())
-                .get(0).getRegions();
-        return listStores()
-                .stream()
-                .filter(store -> regions
-                .contains(store.getBrand().getRegion()))
-                .collect(Collectors.toList());
+    public Set<Store> listStores() {
+        return (Set<Store>) sr.findAll();
     }
 
     public boolean addToStore(Store store) {
@@ -59,14 +48,13 @@ public class StoreService {
 
         //check whether the region of the brand which is to be added to store 
         //is in the list of the regions managed by the dealer
-        if (rs.findBrandsofRole(roleid)
-                .stream()
-                .filter(r -> r.getId() == store.getBrand().getId())
-                .collect(Collectors.toList())
-                .isEmpty()) {
-            return false;
-        }
-
+//        if (rs.findBrandsofRole(roleid)
+//                .stream()
+//                .filter(r -> r.getId() == store.getBrand().getId())
+//                .collect(Collectors.toList())
+//                .isEmpty()) {
+//            return false;
+//        }
         sr.save(store);
         return true;
     }
@@ -77,6 +65,15 @@ public class StoreService {
             store.setUser(to);
             sr.save(store);
         });
+    }
+
+    public boolean deleteStore(Integer id) {
+        if (sr.existsById(id)) {
+            sr.deleteById(id);
+            return true;
+        }
+
+        return false;
     }
 
 }

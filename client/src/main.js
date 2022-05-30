@@ -7,6 +7,7 @@ import StorePage from "./components/StorePage.vue";
 import DealerAccounts from "./components/DealerAccounts.vue";
 import RegionalRoles from "./components/RegionalRoles.vue";
 import LoginPage from "./components/LoginPage.vue";
+import ToDoStepper from "./components/ToDoStepper.vue";
 import "material-design-icons-iconfont/dist/material-design-icons.css";
 import "@mdi/font/css/materialdesignicons.css";
 
@@ -20,6 +21,8 @@ const routes = [
   { path: "/roles", component: RegionalRoles },
   { path: "/login", component: LoginPage },
   { path: "/home", component: HomePage },
+  { path: "/todos", component: ToDoStepper },
+  { path: "*", redirect: "/home" },
 ];
 
 const router = new VueRouter({

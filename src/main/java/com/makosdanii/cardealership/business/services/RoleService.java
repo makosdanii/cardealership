@@ -7,6 +7,7 @@ package com.makosdanii.cardealership.business.services;
 import com.makosdanii.cardealership.data.entities.Brand;
 import com.makosdanii.cardealership.data.entities.Region;
 import com.makosdanii.cardealership.data.entities.Roles;
+import com.makosdanii.cardealership.data.entities.Store;
 import com.makosdanii.cardealership.data.entities.Users;
 import com.makosdanii.cardealership.data.repositories.RegionRepo;
 import com.makosdanii.cardealership.data.repositories.RoleRepo;
@@ -27,11 +28,28 @@ public class RoleService {
 
     private final RoleRepo ror;
     private final RegionService rs;
+    private final UserService us;
+    private final StoreService ss;
 
     @Autowired
-    public RoleService(RoleRepo rr, RegionService rs) {
+    public RoleService(RoleRepo rr, RegionService rs, UserService us, StoreService ss) {
         this.ror = rr;
         this.rs = rs;
+        this.us = us;
+        this.ss = ss;
+    }
+
+    public List<Store> listStoresOfRole(Integer roleId) {
+        List<Region> regions = this.listRolesFetchRegions()
+                .stream()
+                .filter(role -> role.getId() == roleId)
+                .collect(Collectors.toList())
+                .get(0).getRegions();
+        return ss.listStores()
+                .stream()
+                .filter(store -> regions
+                .contains(store.getBrand().getRegion()))
+                .collect(Collectors.toList());
     }
 
     public List<Roles> listRoles() {
@@ -86,4 +104,17 @@ public class RoleService {
     public boolean notExists(String roleName) {
         return ror.findByRoleName(roleName).isEmpty();
     }
+
+    public String deleteRole(Integer id) {
+        if (ror.existsById(id)) {
+            List<Users> users = this.findUsersOfRole(findbyId(id).getRoleName());
+            users.forEach(user -> {
+                us.deleteUser(user.getId());
+            });
+            ror.deleteById(id);
+            return "Role deleted";
+        }
+        return "Invalid ID provided";
+    }
+
 }

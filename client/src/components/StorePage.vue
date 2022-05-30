@@ -1,90 +1,89 @@
 <template>
-  <div data-app id="store-page" class="scrollable-table">
-    <v-dialog v-model="dialog" max-width="500px">
-      <template v-slot:activator="{ on, attrs }">
-        <ResponsiveButtons
-          @filter="(filter) => fullTextSearch(filter)"
-          :on="on"
-          :attrs="attrs"
-          >New Item</ResponsiveButtons
-        ></template
-      >
-      <v-card>
-        <v-card-title>
-          <span class="text-h5">Item</span>
-        </v-card-title>
-        <v-card-text>
-          <v-container>
-            <v-row>
-              <v-alert v-if="alert != ''" type="error">{{ alert }}</v-alert>
-            </v-row>
-            <v-row>
-              <v-col cols="12" sm="6" md="4">
+  <ContextConsumer>
+    <DataTable
+      ref="dataTable"
+      slot-scope="{ getUser }"
+      :headers="
+        getUser() === 'Global Manager'
+          ? [{ text: 'Dealer ID', value: 'userId' }, ...headers]
+          : headers
+      "
+      :items="store"
+      @closed="() => close()"
+      @saved="(id) => save(id)"
+      @onEdit="(idx) => onEdit(idx)"
+      @deleted="(item) => deleteItem(item)"
+      @failed="(idx) => failed(idx)"
+    >
+      <template #button-text>{{ buttonName }}</template>
+      <template #card-name>{{ buttonName.split(" ")[1] }}</template>
+      <template #card-container>
+        <v-container>
+          <v-row>
+            <v-col cols="12" sm="6" md="4">
+              <validation-provider
+                v-slot="{ errors }"
+                name="Quantity"
+                :rules="{ required: true, regex: '^\\d+$' }"
+              >
                 <v-select
                   v-model="editedItem.brand"
                   :items="brands"
                   item-text="brandName"
-                  item-value="brandName"
+                  item-value="id"
                   label="Select"
-                  required
+                  :error-messages="errors"
                 ></v-select>
-              </v-col>
-              <v-col cols="12" sm="6" md="4">
+              </validation-provider>
+            </v-col>
+            <v-col cols="12" sm="6" md="4">
+              <validation-provider
+                v-slot="{ errors }"
+                name="Model"
+                :rules="{ required: true }"
+              >
                 <v-text-field
                   v-model="editedItem.model"
                   label="Model"
+                  :error-messages="errors"
                 ></v-text-field>
-              </v-col>
-              <v-col cols="12" sm="6" md="4">
+              </validation-provider>
+            </v-col>
+            <v-col cols="12" sm="6" md="4">
+              <validation-provider
+                v-slot="{ errors }"
+                name="Quantity"
+                :rules="{ required: true, regex: '^\\d+$' }"
+              >
                 <v-text-field
                   v-model="editedItem.quantity"
                   label="Quantity"
+                  :error-messages="errors"
                 ></v-text-field>
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-card-text>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="close"> Cancel </v-btn>
-          <v-btn color="blue darken-1" text @click="save(0)"> Save </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <v-data-table
-    class="grow-table"
-      style="position: relative"
-      :headers="headers"
-      :items="store"
-      :items-per-page="-1"
-    >
-      <template v-slot:top>
-        <v-toolbar flat>
-          <v-toolbar-title>{{ tableName }}</v-toolbar-title>
-        </v-toolbar>
+              </validation-provider>
+            </v-col>
+          </v-row>
+        </v-container>
       </template>
-      <template v-slot:[`item.quantity`]="props">
-        <v-edit-dialog
-          :return-value.sync="props.item.quantity"
-          @save="save(props.item.id)"
-        >
-          {{ props.item.quantity }}
-          <template #input>
-            <v-text-field v-model="props.item.quantity" label="Edit" />
-          </template>
-        </v-edit-dialog>
-      </template>
-    </v-data-table>
-    <v-snackbar v-model="snack" :timeout="2000">{{ snackText }}</v-snackbar>
-  </div>
+      <template #table-name>{{ tableName }}</template>
+    </DataTable>
+  </ContextConsumer>
 </template>
+
 <script>
 import ApiComponentVue from "../business/ServerAPI.vue";
-import ResponsiveButtons from "../components/ResponsiveButtons.vue";
+import ContextConsumer from "../context/ContextConsumer.vue";
+import DataTable from "./DataTable.vue";
+import lodash from "lodash";
+import { ValidationProvider, setInteractionMode } from "vee-validate";
+
+setInteractionMode("eager");
+
 export default {
   components: {
-    ResponsiveButtons,
+    ContextConsumer,
+    DataTable,
+    ValidationProvider,
   },
   data() {
     return {
@@ -92,79 +91,119 @@ export default {
         { text: "Brand", value: "brand" },
         { text: "Model", value: "model" },
         { text: "Quantity", value: "quantity" },
+        { text: "Actions", value: "actions", sortable: false },
       ],
       store: [],
       brands: [],
       editedItem: {
         id: 0,
-        brand: "",
+        brand: 1,
         model: "",
         quantity: 0,
       },
-      alert: "",
-      dialog: false,
-      snack: false,
-      snackText: "",
+
       tableName: "Items",
       componentName: "Storage",
+      buttonName: "New Item",
     };
   },
 
   methods: {
-    fullTextSearch(filter) {
-      document.querySelectorAll('tbody tr')
-      .forEach(tr => { tr.hidden = ![...tr.querySelectorAll('td')]
-      .reduce((prev, curr) => prev || curr.innerText.includes(filter), false) })
-    },
-    save(idx) {
-      if (idx === 0) {
-        ApiComponentVue.getStore(
-          -1,
-          this.editedItem.brand,
-          this.editedItem.model,
-          this.editedItem.quantity
-        ).then((promise) => {
-          if (promise.data === "Store updated") {
-            this.syncStore();
+    deleteItem(item) {
+      if (confirm(`This item will be deleted ${item["name"]}`)) {
+        ApiComponentVue.getStoreDelete(item["id"]).then((promise) => {
+          if (promise.data === "Item deleted") {
+            this.store = this.store.filter(
+              (_item) => _item["id"] !== item["id"]
+            );
           }
-          this.snackText = promise.data;
-          this.snack = true;
-        });
-      } else {
-        this.editedItem = this.store.filter((item) => item["id"] === idx)[0];
-        ApiComponentVue.getStore(
-          this.editedItem.id,
-          this.editedItem.brand,
-          this.editedItem.model,
-          this.editedItem.quantity
-        ).then((promise) => {
-          this.snackText = promise.data;
-          this.snack = true;
+          this.$refs.dataTable.snackText = promise.data;
+          this.$refs.dataTable.snack = true;
         });
       }
+    },
+    failed(id) {
+      // const storeCopy = lodash.cloneDeep(this.store);
+
+      // var myStr = "foo";
+      // var newStr = (" " + myStr).slice(1);
+      // console.log(`Old ${myStr} vs new ${newStr}`);
+      // console.log("Comparing string with deep ", newStr == myStr);
+
+      // var foo1 = new String("foo");
+      // var foo2 = new String("foo");
+      // console.log("Comparing string with deep ", foo1 === foo2);
+
+      this.$refs.dataTable.snackText = `Not updated: invalid quantity for item with ID: ${id}`;
+      this.$refs.dataTable.snack = true;
+      this.$refs.dataTable.editDialog = true;
+
+      const modified = this.store.filter((item) => item.id === id)[0];
+      const input = parseInt(new String((" " + modified.quantity).slice(1)));
+      modified.quantity = isNaN(input) ? 0 : input;
+
+      //       const modifiedCopy = JSON.parse(JSON.stringify(modified));
+      // //attempt no. 1
+      //       const unmodified = this.store.filter((item) => item.id !== id);
+      //       const store = [modifiedCopy, ...unmodified];
+
+      //       const idx = this.store.findIndex((item) => item.id === id);
+      // //attempt no. 2
+      //       this.store[idx] = modifiedCopy
+      // //attempt no. 3
+      //       this.store[idx].quantity = isNaN(input) ? 0 : input;
+      this.syncStore();
+      this.editedItem = {
+        id: 0,
+        brand: 1,
+        model: "",
+        quantity: 0,
+      };
+    },
+    onEdit(idx) {
+      this.editedItem = this.store.filter((item) => item.id == idx)[0]; //pass by ref
+    },
+    save(id) {
+      ApiComponentVue.getStore(
+        this.editedItem.id === 0 ? "" : this.editedItem.id,
+        this.editedItem.brand,
+        this.editedItem.model,
+        this.editedItem.quantity
+      ).then(
+        function (promise) {
+          if (promise.data === "Store updated" && id === 0) {
+            this.syncStore();
+          }
+          this.$refs.dataTable.snackText = promise.data;
+          this.$refs.dataTable.snack = true;
+        }.bind(this)
+      );
 
       this.editedItem = {
         id: 0,
-        brand: "",
+        brand: 1,
         model: "",
         quantity: 0,
       };
     },
+
     close() {
-      this.dialog = false;
+      this.$refs.dataTable.dialog = false;
       this.editedItem = {
         id: 0,
-        brand: "",
+        brand: 1,
         model: "",
         quantity: 0,
       };
     },
+
     syncStore() {
       this.store = [];
       ApiComponentVue.getAllStores().then((promise) => {
         for (let i = 0; i < promise.data.length; i++) {
           this.store.push({
             id: promise.data[i]["id"],
+            userId: promise.data[i]["user"],
             brand: promise.data[i]["brand"]["brandName"],
             model: promise.data[i]["model"],
             quantity: promise.data[i]["quantity"],

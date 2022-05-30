@@ -20,6 +20,11 @@
         </v-card>
       </v-container>
     </v-main>
+    <!-- <v-footer app>
+      <a style="font-size: 10 px" href="https://www.freepik.com/vectors/set"
+        >Set vector created by freepik - www.freepik.com</a
+      >
+    </v-footer> -->
   </v-app>
 </template>
 
@@ -88,8 +93,7 @@ export default {
       () => {
         return this.$route.path;
       },
-      // eslint-disable-next-line no-unused-vars
-      (value) => {
+      () => {
         this.$refs.title.innerHTML = this.navbarTitle(false);
       }
     );

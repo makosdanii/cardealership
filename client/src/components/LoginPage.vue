@@ -4,6 +4,8 @@
       <v-btn
         @click.native="submit(getUser, setUser)"
         v-if="getUser() !== 'nobody'"
+        depressed
+        color="error"
         type="submit"
         class="scrolled"
         >Logout</v-btn
@@ -41,7 +43,9 @@
               required
             ></v-text-field>
           </validation-provider>
-          <v-btn class="mr-4" type="submit" :disabled="invalid"> Login </v-btn>
+          <v-btn class="mr-4" type="submit" :disabled="invalid">
+            {{ getUser() === "nobody" ? "Login" : "Logout" }}
+          </v-btn>
         </form>
       </validation-observer>
 
@@ -56,7 +60,6 @@ import {
   extend,
   ValidationObserver,
   ValidationProvider,
-  // eslint-disable-next-line no-unused-vars
   setInteractionMode,
 } from "vee-validate";
 
@@ -65,15 +68,18 @@ import ContextConsumer from "../context/ContextConsumer.vue";
 
 setInteractionMode("eager");
 
-extend("email", { ...email, message: "Email not valid" });
-extend("required", { ...required, message: "{_field_} can not be empty" });
+extend("email", { ...email, message: "Give a valid email format" });
+extend("required", {
+  ...required,
+  message: "Remember not to leave {_field_} empty",
+});
 extend("regex", {
   ...regex,
-  message: "{_field_} does not match {regex}",
+  message: "{_field_} should match {regex}",
 });
 extend("min", {
   ...min,
-  message: "{_field_} must be {length} long",
+  message: "Give at least {length} long input for {_field_}",
 });
 
 export default {
@@ -99,7 +105,7 @@ export default {
         ApiComponent.postAuth(this.email, this.password).then((promise) => {
           if (promise.data === "Success") {
             ApiComponent.getLoggedIn().then((promise) => setUser(promise.data));
-            this.$router.push("/");
+            this.$router.push("/home");
           } else {
             this.snackText = promise.data;
             this.snack = true;

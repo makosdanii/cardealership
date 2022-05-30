@@ -1,139 +1,121 @@
 <template>
-  <div data-app id="dealer-accounts" class="scrollable-table">
-    <v-dialog v-model="dialog" max-width="500px">
-      <template v-slot:activator="{ on, attrs }">
-        <ResponsiveButtons :on="on" :attrs="attrs" 
-        @filter="(filter) => fullTextSearch(filter)"
-          >New Dealer</ResponsiveButtons
-        >
-      </template>
-      <v-card>
-        <v-card-title>
-          <span class="text-h5">Dealer</span>
-        </v-card-title>
-        <v-card-text>
-          <v-container>
-            <v-row>
-              <v-col cols="12" sm="6" md="4">
-                <v-text-field
-                  v-model="editedItem.email"
-                  label="Email"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12" sm="6" md="4">
-                <v-text-field
-                  v-model="editedItem.name"
-                  label="Name"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12" sm="6" md="4">
-                <v-text-field
-                  type="password"
-                  v-model="editedItem.password"
-                  label="Password"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12" sm="6" md="4">
-                <v-select
-                  v-model="editedItem.role"
-                  :items="roles"
-                  item-text="roleName"
-                  item-value="id"
-                  label="Select"
-                  required
-                ></v-select>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-container class="px-0" fluid>
-                <v-checkbox
-                  v-model="editedItem.driverslicense"
-                  label="Drivers license"
-                ></v-checkbox>
-              </v-container>
-            </v-row>
+  <DataTable
+    ref="dataTable"
+    :headers="headers"
+    :items="dealers"
+    @closed="() => close()"
+    @saved="() => save()"
+    @deleted="(item) => deleteItem(item)"
+    @onEdit="(idx) => onEdit(idx)"
+  >
+    <template #button-text>{{ buttonName }}</template>
+    <template #card-name>{{ buttonName.split(" ")[1] }}</template>
+    <template #card-container>
+      <v-container>
+        <v-row>
+          <v-col cols="12" sm="6" md="4">
+            <validation-provider
+              v-slot="{ errors }"
+              name="Email"
+              :rules="{ required: true, email: true }"
+            >
+              <v-text-field
+                v-model="editedItem.email"
+                label="Email"
+                :error-messages="errors"
+                :disabled="editedItem.id !== 0"
+              ></v-text-field>
+            </validation-provider>
+          </v-col>
+          <v-col cols="12" sm="6" md="4">
+            <validation-provider
+              v-slot="{ errors }"
+              name="Name"
+              :rules="{ required: true }"
+            >
+              <v-text-field
+                v-model="editedItem.name"
+                label="Name"
+                :error-messages="errors"
+              ></v-text-field>
+            </validation-provider>
+          </v-col>
+          <v-col cols="12" sm="6" md="4">
+            <validation-provider
+              v-slot="{ errors }"
+              name="Password"
+              :rules="{
+                required: true,
+                min: 8,
+                regex: '^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$',
+              }"
+            >
+              <v-text-field
+                type="password"
+                v-model="editedItem.password"
+                label="Password"
+                :error-messages="errors"
+              ></v-text-field>
+            </validation-provider>
+          </v-col>
+          <v-col cols="12" sm="6" md="4">
+            <validation-provider
+              v-slot="{ errors }"
+              name="Rolename"
+              :rules="{ required: true }"
+            >
+              <v-select
+                v-model="editedItem.role"
+                :items="roles"
+                item-text="roleName"
+                item-value="id"
+                label="Select"
+                :error-messages="errors"
+              ></v-select>
+            </validation-provider>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-container class="px-0" fluid>
+            <v-checkbox
+              v-model="editedItem.driverslicense"
+              label="Drivers license"
+            ></v-checkbox>
           </v-container>
-        </v-card-text>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="close"> Cancel </v-btn>
-          <v-btn color="blue darken-1" text @click="save"> Save </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <v-data-table :headers="headers" :items="dealers" :items-per-page="-1">
-      <template v-slot:top>
-        <v-toolbar flat>
-          <v-toolbar-title>{{ tableName }}</v-toolbar-title>
-        </v-toolbar>
-      </template>
-      <template v-slot:[`item.actions`]="{ item }">
-        <!-- <v-icon small class="mr-2" @click="editItem(item)"> mdi-pencil </v-icon> -->
-        <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
-      </template>
-      <template v-slot:no-data>
-        <p>No data</p>
-      </template>
-    </v-data-table>
-    <v-snackbar v-model="snack" :timeout="2000">{{ snackText }}</v-snackbar>
-  </div>
+        </v-row>
+      </v-container>
+    </template>
+    <template #table-name>{{ tableName }}</template>
+  </DataTable>
 </template>
 
 <script>
 import ApiComponent from "../business/ServerAPI.vue";
-import ResponsiveButtons from "./ResponsiveButtons.vue";
+import DataTable from "./DataTable.vue";
+import { ValidationProvider, setInteractionMode } from "vee-validate";
+
+setInteractionMode("eager");
 
 const headers = [
   { text: "Email", value: "email" },
   { text: "Name", value: "name" },
   { text: "Password", value: "password" },
-  { text: "Role", value: "role" },
+  { text: "Role", value: "roleName" },
   { text: "Actions", value: "actions", sortable: false },
 ];
 
-const editedIndex = -1;
-
 export default {
   components: {
-    ResponsiveButtons,
-  },
-  data() {
-    return {
-      dialog: false,
-      headers,
-      dealers: [],
-      roles: [],
-      editedIndex,
-      editedItem: {
-        email: "example@domain.com",
-        name: "Firstname Lastname",
-        driverslicense: false,
-        password: "",
-        role: -1,
-      },
-      snack: false,
-      snackText: "",
-      tableName: "Accounts",
-      componentName: "Dealers",
-    };
+    DataTable,
+    ValidationProvider,
   },
 
-  computed: {
-    formTitle() {
-      return editedIndex === -1 ? "New Item" : "Edit Item";
-    },
-  },
+  inject: ["getRoles"],
 
   methods: {
-    fullTextSearch(filter) {
-      document.querySelectorAll('tbody tr')
-      .forEach(tr => { tr.hidden = ![...tr.querySelectorAll('td')]
-      .reduce((prev, curr) => prev || curr.innerText.includes(filter), false) })
-    },
     save() {
       ApiComponent.postDealer(
+        this.editedItem.id == 0 ? "" : this.editedItem.id,
         this.editedItem.email,
         this.editedItem.name,
         this.editedItem.driverslicense,
@@ -143,26 +125,34 @@ export default {
         if (promise.data === "User added") {
           this.syncUsers();
         }
-        this.snackText = promise.data;
-        this.snack = true;
+        this.$refs.dataTable.snackText = promise.data;
+        this.$refs.dataTable.snack = true;
       });
       this.editedItem = {
+        id: 0,
         email: "example@domain.com",
         name: "Firstname Lastname",
         driverslicense: false,
         password: "",
-        role: -1,
+        role: 1,
       };
     },
-    close: function () {
-      this.dialog = false;
+    close() {
+      this.$refs.dataTable.dialog = false;
       this.editedItem = {
+        id: 0,
         email: "example@domain.com",
         name: "Firstname Lastname",
         driverslicense: false,
         password: "",
-        role: -1,
+        role: 1,
       };
+    },
+    onEdit(idx) {
+      this.editedItem = JSON.parse(
+        JSON.stringify(this.dealers.filter((dealer) => dealer.id == idx)[0])
+      );
+      this.$refs.dataTable.dialog = true;
     },
     deleteItem(item) {
       if (confirm(`This dealer will be deleted ${item["name"]}`)) {
@@ -172,14 +162,10 @@ export default {
               (dealer) => dealer["id"] !== item["id"]
             );
           }
-          this.snackText = promise.data;
-          this.snack = true;
+          this.$refs.dataTable.snackText = promise.data;
+          this.$refs.dataTable.snack = true;
         });
       }
-    },
-    editItem(item) {
-      this.editedItem = Object.assign({}, item);
-      this.dialog = true;
     },
     syncUsers() {
       this.dealers = [];
@@ -190,24 +176,37 @@ export default {
             email: promise.data[i]["email"],
             name: promise.data[i]["name"],
             password: promise.data[i]["password"],
-            role: promise.data[i]["role"]["roleName"],
+            roleName: promise.data[i]["role"]["roleName"],
+            role: promise.data[i]["role"]["id"],
           });
         }
       });
     },
   },
 
+  data() {
+    return {
+      headers,
+      dealers: [],
+      roles: [],
+      editedItem: {
+        id: 0,
+        email: "example@domain.com",
+        name: "Firstname Lastname",
+        driverslicense: false,
+        password: "",
+        role: 1,
+      },
+
+      tableName: "Accounts",
+      componentName: "Dealers",
+      buttonName: "New Dealer",
+    };
+  },
+
   mounted() {
     this.syncUsers();
-
-    ApiComponent.getAllRoles().then((promise) => {
-      for (let i = 0; i < promise.data.length; i++) {
-        this.roles.push({
-          id: promise.data[i]["id"],
-          roleName: promise.data[i]["roleName"],
-        });
-      }
-    });
+    this.roles = this.getRoles();
   },
 };
 </script>
